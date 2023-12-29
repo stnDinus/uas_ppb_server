@@ -246,6 +246,6 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 type Item struct {
-	ID, Name, Description, DetailedDescription, ImgPath string
-	Price                                               uint
+	ID, Price                                       uint
+	Name, Description, DetailedDescription, ImgPath string
 }
