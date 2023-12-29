@@ -55,18 +55,6 @@ func main() {
 	}
 	defer db.Close()
 
-	// init users table
-	if _, err = db.Exec(
-		fmt.Sprintf("CREATE TABLE IF NOT EXISTS users (%v)", strings.Join([]string{
-			"id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT",
-			"username CHAR(20)",
-			"password_hash CHAR(64)",
-		}, ",")),
-	); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(-1)
-	}
-
 	// init items table
 	if _, err = db.Exec(
 		fmt.Sprintf("CREATE TABLE IF NOT EXISTS items (%v)", strings.Join([]string{
