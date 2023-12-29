@@ -70,11 +70,12 @@ func main() {
 	// init items table
 	if _, err = db.Exec(
 		fmt.Sprintf("CREATE TABLE IF NOT EXISTS items (%v)", strings.Join([]string{
-			"id CHAR(5) PRIMARY KEY",
-			"name CHAR(64) NOT NULL",
-			"buy_price INT UNSIGNED NOT NULL",
-			"sell_price INT UNSIGNED NOT NULL",
-			"stock INT UNSIGNED NOT NULL",
+			"id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT",
+			"name CHAR(64)",
+			"description VARCHAR(128)",
+			"detailed_description VARCHAR(256)",
+			"img_path VARCHAR(256)",
+			"price INT UNSIGNED",
 		}, ",")),
 	); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -117,11 +118,11 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 				// init itemMap
 				itemMap := map[string]string{}
 				for _, v := range []string{
-					"ID",
 					"Name",
-					"BuyPrice",
-					"SellPrice",
-					"Stock",
+					"Description",
+					"DetailedDescription",
+					"ImgPath",
+					"Price",
 				} {
 					if !req.PostForm.Has(v) {
 						res.WriteHeader(400)
@@ -133,13 +134,14 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 				// insert item into db
 				if _, err := wsh.DB.Exec(
-					"INSERT INTO items VALUES(?, ?, ?, ?, ?)",
-					itemMap["ID"],
+					"INSERT INTO items(name, description, detailed_description, img_path, price) VALUES(?, ?, ?, ?, ?)",
 					itemMap["Name"],
-					itemMap["BuyPrice"],
-					itemMap["SellPrice"],
-					itemMap["Stock"],
+					itemMap["Description"],
+					itemMap["DetailedDescription"],
+					itemMap["ImgPath"],
+					itemMap["Price"],
 				); err != nil {
+					fmt.Fprintln(os.Stderr, err)
 					res.WriteHeader(400)
 					return
 				} else {
@@ -162,9 +164,10 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 					if err := rows.Scan(
 						&item.ID,
 						&item.Name,
-						&item.BuyPrice,
-						&item.SellPrice,
-						&item.Stock,
+						&item.Description,
+						&item.DetailedDescription,
+						&item.ImgPath,
+						&item.Price,
 					); err != nil {
 						fmt.Fprintln(os.Stderr, err)
 						res.WriteHeader(500)
@@ -197,9 +200,10 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 				for _, v := range []string{
 					"ID",
 					"Name",
-					"BuyPrice",
-					"SellPrice",
-					"Stock",
+					"Description",
+					"DetailedDescription",
+					"ImgPath",
+					"Price",
 				} {
 					if !req.PostForm.Has(v) {
 						res.WriteHeader(400)
@@ -211,11 +215,12 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 				// update item
 				if _, err := wsh.DB.Exec(
-					"UPDATE items SET name=?, buy_price=?, sell_price=?, stock = ? WHERE id=?",
+					"UPDATE items SET name=?, description=?, detailed_description=?, img_path=?, price=? WHERE id=?",
 					itemMap["Name"],
-					itemMap["BuyPrice"],
-					itemMap["SellPrice"],
-					itemMap["Stock"],
+					itemMap["Description"],
+					itemMap["DetailedDescription"],
+					itemMap["ImgPath"],
+					itemMap["Price"],
 					itemMap["ID"],
 				); err != nil {
 					res.WriteHeader(400)
@@ -253,6 +258,6 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 type Item struct {
-	ID, Name                   string
-	BuyPrice, SellPrice, Stock uint
+	ID, Name, Description, DetailedDescription, ImgPath string
+	Price                                               uint
 }
