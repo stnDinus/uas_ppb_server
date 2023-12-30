@@ -61,7 +61,7 @@ func main() {
 			"id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT",
 			"name CHAR(64)",
 			"description VARCHAR(128)",
-			"detailed_description VARCHAR(256)",
+			"detailed_description VARCHAR(500)",
 			"img_path VARCHAR(256)",
 			"price INT UNSIGNED",
 		}, ",")),
