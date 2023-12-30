@@ -70,6 +70,21 @@ func main() {
 		os.Exit(-1)
 	}
 
+	if _, exists := os.LookupEnv("FILL_ITEMS"); exists {
+		if rows, err := db.Query("SELECT COUNT(*) FROM items;"); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(-1)
+		} else {
+			var scanned_rows uint
+			rows.Next()
+			rows.Scan(&scanned_rows)
+			rows.Close()
+			if scanned_rows == 0 {
+				fill_items(db)
+			}
+		}
+	}
+
 	// init web server
 	s := http.Server{
 		Addr: fmt.Sprintf(":%s", env["LISTEN_PORT"]),
@@ -248,4 +263,91 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 type Item struct {
 	ID, Price                                       uint
 	Name, Description, DetailedDescription, ImgPath string
+}
+
+func fill_items(db *sql.DB) {
+	for _, item := range []Item{
+		{
+			Name:                "Jeruk",
+			Description:         "Buah jeruk segar hasil pertanian.",
+			DetailedDescription: "Jeruk (Citrus sinensis) adalah buah segar dengan rasa manis dan asam yang berasal dari pohon jeruk. Buah jeruk sering digunakan untuk diolah menjadi jus segar. Jeruk mengandung banyak vitamin C dan serat yang baik untuk kesehatan tubuh. Buah ini dapat tumbuh subur di daerah beriklim tropis dan subtropis.",
+			ImgPath:             "assets/jeruk.jpg",
+			Price:               10000,
+		},
+		{
+			Name:                "Pohon Mangga",
+			Description:         "Bibit pohon mangga untuk ditanam.",
+			DetailedDescription: "Pohon mangga (Mangifera indica) adalah pohon buah yang menghasilkan buah mangga. Buah mangga terkenal dengan rasa manisnya yang lezat. Bibit pohon mangga cocok untuk ditanam di halaman rumah atau kebun. Pohon mangga memerlukan sinar matahari yang cukup dan perawatan yang baik untuk menghasilkan buah yang berkualitas.",
+			ImgPath:             "assets/mangga.jpg",
+			Price:               12000,
+		},
+		{
+			Name:                "Pupuk Cair Organik",
+			Description:         "Pupuk cair organik untuk pertanian.",
+			DetailedDescription: "Pupuk cair organik adalah pupuk yang terbuat dari bahan-bahan alami seperti kompos, limbah organik, dan mikroorganisme. Pupuk ini membantu meningkatkan kesuburan tanah dan memberikan nutrisi yang dibutuhkan tanaman. Pupuk cair organik cocok digunakan untuk pertanian organik dan ramah lingkungan.",
+			ImgPath:             "assets/pupuk.jpg",
+			Price:               15000,
+		},
+		{
+			Name:                "Tebu",
+			Description:         "Gula tebu hasil pertanian.",
+			DetailedDescription: "Tebu (Saccharum officinarum) adalah tanaman yang menghasilkan tebu, bahan baku untuk gula. Tebu ditanam dalam skala besar untuk menghasilkan gula dalam berbagai bentuk, termasuk gula pasir dan gula cair. Hasil pertanian tebu adalah komoditas penting dalam industri pangan.",
+			ImgPath:             "assets/tebu.jpg",
+			Price:               11000,
+		},
+		{
+			Name:                "Bibit Kelapa",
+			Description:         "Bibit kelapa untuk ditanam.",
+			DetailedDescription: "Bibit kelapa adalah tanaman kelapa muda yang siap ditanam. Kelapa adalah salah satu pohon penting dalam ekosistem tropis dan subtropis. Buah kelapa menghasilkan air kelapa segar dan daging kelapa yang dapat digunakan dalam berbagai hidangan.",
+			ImgPath:             "assets/kelapa.jpg",
+			Price:               13000,
+		},
+		{
+			Name:                "Pupuk NPK",
+			Description:         "Pupuk NPK untuk pertanian.",
+			DetailedDescription: "Pupuk NPK adalah pupuk komersial yang mengandung campuran nitrogen (N), fosfor (P), dan kalium (K). Nutrisi ini penting untuk pertumbuhan tanaman dan produksi hasil yang baik. Pupuk NPK digunakan secara luas dalam pertanian modern untuk meningkatkan hasil panen.",
+			ImgPath:             "assets/npk.jpg",
+			Price:               14000,
+		},
+		{
+			Name:                "Tomat",
+			Description:         "Tomat segar hasil pertanian.",
+			DetailedDescription: "Tomat (Solanum lycopersicum) adalah buah sayuran yang sering digunakan dalam berbagai hidangan. Tomat segar mengandung vitamin C, vitamin A, dan likopen yang baik untuk kesehatan. Buah ini dapat dikonsumsi segar atau digunakan dalam masakan.",
+			ImgPath:             "assets/tomat.jpg",
+			Price:               12000,
+		},
+		{
+			Name:                "Bibit Jeruk",
+			Description:         "Bibit jeruk untuk ditanam.",
+			DetailedDescription: "Bibit jeruk adalah tanaman muda dari pohon jeruk yang siap ditanam. Jeruk adalah sumber vitamin C yang baik dan sering digunakan untuk diolah menjadi minuman segar. Tanaman jeruk memerlukan perawatan yang baik untuk menghasilkan buah yang berkualitas.",
+			ImgPath:             "assets/bibit-jeruk.jpg",
+			Price:               11000,
+		},
+		{
+			Name:                "Pupuk Organik Granular",
+			Description:         "Pupuk organik granular untuk pertanian.",
+			DetailedDescription: "Pupuk organik granular adalah pupuk yang terbuat dari bahan-bahan organik seperti kompos, pupuk kandang, dan bahan alami lainnya. Pupuk ini membantu meningkatkan kesuburan tanah dan memberikan nutrisi yang dibutuhkan tanaman dengan cara yang ramah lingkungan. Cocok untuk pertanian organik.",
+			ImgPath:             "assets/granular.jpg",
+			Price:               16000,
+		},
+		{
+			Name:                "Stroberi",
+			Description:         "Stroberi segar hasil pertanian.",
+			DetailedDescription: "Stroberi (Fragaria × ananassa) adalah buah segar dengan rasa manis yang populer. Stroberi mengandung vitamin C, serat, dan antioksidan yang baik untuk kesehatan. Buah ini sering digunakan dalam hidangan penutup seperti tart dan es krim.",
+			ImgPath:             "assets/stroberi.jpg",
+			Price:               13000,
+		},
+	} {
+		if _, err := db.Exec(
+			"INSERT INTO items(name, description, detailed_description, img_path, price) VALUES(?, ?, ?, ?, ?)",
+			item.Name,
+			item.Description,
+			item.DetailedDescription,
+			item.ImgPath,
+			item.Price,
+		); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+	}
 }
