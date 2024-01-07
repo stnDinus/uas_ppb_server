@@ -1,4 +1,6 @@
 ### relevant environment variables
+> [!NOTE]
+> `.env` also works
 #### required
 - `LISTEN_PORT` this server's listening port
 - `DB_USERNAME`
