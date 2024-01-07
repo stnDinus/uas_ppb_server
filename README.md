@@ -8,4 +8,4 @@
 - `FILL_ITEMS` initialize items table
 
 ### how to run
-go run .
+`go run .`
