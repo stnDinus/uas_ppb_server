@@ -22,6 +22,7 @@ func main() {
 		"DB_USERNAME": "",
 		"DB_PASSWORD": "",
 		"DB_NAME":     "",
+		"AUTH_KEY":    "",
 	}
 	for k := range env {
 		value, exists := os.LookupEnv(k)
@@ -90,7 +91,8 @@ func main() {
 	s := http.Server{
 		Addr: fmt.Sprintf(":%s", env["LISTEN_PORT"]),
 		Handler: WsHandler{
-			DB: db,
+			DB:  db,
+			env: &env,
 		},
 	}
 	defer s.Close()
@@ -106,13 +108,35 @@ func main() {
 	os.Exit(-1)
 }
 
+// / Authorization: "Bearer <AUTH_KEY>"
+func validateAuth(auth_key string, req *http.Request, res *http.ResponseWriter) bool {
+	// validate key length
+	if len(req.Header.Get("Authorization")) < 7 {
+		(*res).WriteHeader(400)
+		return false
+	}
+
+	// validate key
+	if auth_key != req.Header.Get("Authorization")[7:] {
+		(*res).WriteHeader(400)
+		return false
+	}
+
+	return true
+}
+
 type WsHandler struct {
-	DB *sql.DB
+	DB  *sql.DB
+	env *map[string]string
 }
 
 func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	switch req.URL.Path {
 	case "/create":
+		if validateAuth((*wsh.env)["AUTH_KEY"], req, &res) != true {
+			break
+		}
+
 		if req.Method == "POST" {
 			if err := req.ParseForm(); err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -196,6 +220,10 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			}
 		}
 	case "/update":
+		if validateAuth((*wsh.env)["AUTH_KEY"], req, &res) != true {
+			break
+		}
+
 		if req.Method == "PUT" {
 			if err := req.ParseForm(); err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -240,6 +268,10 @@ func (wsh WsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 	case "/delete":
+		if validateAuth((*wsh.env)["AUTH_KEY"], req, &res) != true {
+			break
+		}
+
 		if req.Method == "DELETE" {
 			if err := req.ParseForm(); err != nil {
 				fmt.Fprintln(os.Stderr, err)
