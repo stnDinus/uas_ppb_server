@@ -6,6 +6,7 @@
 - `DB_USERNAME`
 - `DB_PASSWORD`
 - `DB_NAME`
+- `AUTH_KEY` client's Authorization header
 #### optional
 - `FILL_ITEMS` initialize items table
 
