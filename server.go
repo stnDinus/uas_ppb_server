@@ -54,6 +54,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
+	db.SetConnMaxLifetime(0)
 	defer db.Close()
 
 	// init items table
