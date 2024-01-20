@@ -55,6 +55,7 @@ func main() {
 		os.Exit(-1)
 	}
 	db.SetConnMaxLifetime(0)
+	db.SetConnMaxIdleTime(0)
 	defer db.Close()
 
 	// init items table
