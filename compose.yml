@@ -1,0 +1,28 @@
+name: pejuang-tani-be
+services:
+  pejuang-tani-srv:
+    depends_on:
+      pejuang-tani-db:
+        condition: service_healthy
+    environment:
+      LISTEN_PORT: ${LISTEN_PORT:-8085}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD?error}
+      DB_NAME: ${DB_NAME:-pejuang_tani_tbl}
+      AUTH_KEY: ${AUTH_KEY?error}
+      FILL_ITEMS: true
+    build:
+      context: .
+      dockerfile: Dockerfile.multistage
+    network_mode: host
+  pejuang-tani-db:
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD?error}
+    image: mariadb:11.4
+    network_mode: host
