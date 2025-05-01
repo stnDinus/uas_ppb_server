@@ -28,3 +28,11 @@ services:
     image: mariadb:11.4
     ports:
       - ${LISTEN_PORT:-8089}:${LISTEN_PORT:-8089}
+    volumes:
+      - type: volume
+        source: pejuang-tani-db-data
+        target: /var/lib/mysql
+        bind:
+          selinux: Z
+volumes:
+  pejuang-tani-db-data:
