@@ -11,6 +11,7 @@ services:
       DB_NAME: ${DB_NAME:-pejuang_tani_tbl}
       AUTH_KEY: ${AUTH_KEY?error}
       FILL_ITEMS: true
+    image: ghcr.io/stndinus/pejuang-tani-srv:2025-05-01
     build:
       context: .
       dockerfile: Dockerfile.multistage
