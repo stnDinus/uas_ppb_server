@@ -18,3 +18,4 @@ COPY --from=build-stage /pejuang-tani-srv .
 
 ENTRYPOINT ["/pejuang-tani-srv"]
 
+LABEL org.opencontainers.image.source https://github.com/stnDinus/uas_ppb_server
