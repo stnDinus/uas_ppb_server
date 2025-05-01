@@ -1,6 +1,8 @@
 ### relevant environment variables
 
-> [!NOTE] > `.env` also works
+> [!note]
+>
+> `.env` also works
 
 #### required
 
