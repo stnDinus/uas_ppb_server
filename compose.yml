@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.multistage
-    network_mode: host
+    network_mode: service:pejuang-tani-db
   pejuang-tani-db:
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
@@ -26,4 +26,5 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD?error}
     image: mariadb:11.4
-    network_mode: host
+    ports:
+      - ${LISTEN_PORT:-8089}:${LISTEN_PORT:-8089}
