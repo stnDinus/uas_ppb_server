@@ -5,7 +5,7 @@ services:
       pejuang-tani-db:
         condition: service_healthy
     environment:
-      LISTEN_PORT: ${LISTEN_PORT:-8085}
+      LISTEN_PORT: ${LISTEN_PORT:-8089}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD?error}
       DB_NAME: ${DB_NAME:-pejuang_tani_tbl}
