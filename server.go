@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -56,6 +57,18 @@ func main() {
 	}
 	db.SetConnMaxLifetime(0)
 	db.SetConnMaxIdleTime(0)
+
+	ticker := time.NewTicker(time.Hour)
+	go func() {
+		for {
+			if err := db.Ping(); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(-1)
+			}
+			<-ticker.C
+		}
+	}()
+
 	defer db.Close()
 
 	// init items table
@@ -74,6 +87,7 @@ func main() {
 		os.Exit(-1)
 	}
 
+	// BUG: will fill if items is empty no matter what
 	if _, exists := os.LookupEnv("FILL_ITEMS"); exists {
 		if rows, err := db.Query("SELECT COUNT(*) FROM items;"); err != nil {
 			fmt.Fprintln(os.Stderr, err)
